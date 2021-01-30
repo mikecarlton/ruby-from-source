@@ -8,8 +8,9 @@
 ### configuration info
 # get version and signature from https://www.ruby-lang.org/en/downloads/
 
-src="https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.1.tar.gz"
-sha256="d418483bdd0000576c1370571121a6eb24582116db0b7bb2005e90e250eae418"
+src="https://cache.ruby-lang.org/pub/ruby/3.0/ruby-3.0.0.tar.gz"
+sha256="a13ed141a1c18eb967aac1e33f4d6ad5f21be1ac543c344e0d6feeee54af8e28"
+# config_options=""			# raspberrypi fails to build with jemalloc
 config_options="--with-jemalloc"
 
 ### end of configuration
@@ -21,20 +22,22 @@ red=`tput setaf 1`
 green=`tput setaf 2`
 reset=`tput sgr0`
 
-cd /tmp
+BUILD=/home/mike/ruby
+mkdir -p "$BUILD"
+cd "$BUILD"
 
 file=$(basename "$src")
 dir="${file/.tar.*/}"
-shasums="/tmp/ruby.sha256"
+shasums="ruby.sha256"
 
-echo "$sha256 $file" > "$shasums"
+echo "$sha256  $file" > "$shasums"
 
-if [[ ! -f "$file" ]] || ! sha256sum --status -c "$shasums" ; then
+if [[ ! -f "$file" ]] || ! shasum -a 256 --status -c "$shasums" ; then
   echo "#{green}Downloading ${file}${reset}"
   curl -L -O "$src"
 fi
 
-if ! sha256sum --status -c "$shasums" ; then
+if ! shasum -a 256 --status -c "$shasums" ; then
   echo "#{red}Unable to download ruby source, giving up${reset}"
   exit 1
 fi
